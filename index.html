@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>面白Tシャツメーカー</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700&family=Noto+Sans+JP:wght@400;700&family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Zen Maru Gothic', sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .rounded-panel {
+            border-radius: 2.5rem;
+        }
+        .preview-area {
+            min-height: 600px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-image: radial-gradient(#ccc 1px, transparent 1px);
+            background-size: 24px 24px;
+            border-radius: 2rem;
+        }
+        #spineCanvas {
+            display: none;
+        }
+        #previewImage {
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            max-width: 95%;
+            height: auto;
+            border-radius: 2px;
+            display: block;
+        }
+        .option-group {
+            background: #f9f9f9;
+            padding: 1.25rem;
+            border-radius: 1.5rem;
+        }
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 1rem;
+        }
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div class="max-w-4xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8">
+        
+        <!-- 設定パネル -->
+        <div class="bg-white rounded-panel p-8 shadow-sm border border-gray-100 space-y-6">
+            <header>
+                <h1 class="text-3xl font-bold tracking-tighter text-black">面白Tシャツメーカー</h1>
+                <p class="text-sm text-gray-500 mt-2 font-medium">面白Tシャツをデザインして保存</p>
+            </header>
+
+            <div class="space-y-5">
+                <div class="option-group">
+                    <label class="block text-sm font-bold mb-2">メインの文字（改行可）</label>
+                    <textarea id="bookTitle" class="w-full px-4 py-3 bg-white rounded-xl outline-none text-lg leading-relaxed border-2 border-transparent focus:border-black transition-all" rows="2">働きたくない
+絶対にだ</textarea>
+                </div>
+
+                <div class="option-group">
+                    <label class="block text-sm font-bold mb-2">サブの文字</label>
+                    <input type="text" id="bookAuthor" class="w-full px-4 py-3 bg-white rounded-xl outline-none text-md border-2 border-transparent focus:border-black transition-all" placeholder="文字を入力" value="(切実)">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="option-group">
+                        <label class="block text-sm font-bold mb-2">書体</label>
+                        <select id="fontFamily" class="w-full bg-white px-2 py-2 rounded-lg outline-none cursor-pointer">
+                            <option value="'Zen Maru Gothic'">丸ゴシック</option>
+                            <option value="'Noto Sans JP'">角ゴシック</option>
+                            <option value="'Noto Serif JP'">明朝体</option>
+                        </select>
+                    </div>
+                    <div class="option-group">
+                        <label class="block text-sm font-bold mb-2">太さ</label>
+                        <select id="fontWeight" class="w-full bg-white px-2 py-2 rounded-lg outline-none cursor-pointer">
+                            <option value="400">標準</option>
+                            <option value="700" selected>太字</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button id="generateBtn" class="w-full bg-black text-white font-bold py-5 rounded-2xl hover:opacity-80 active:scale-[0.98] transition-all shadow-xl text-lg">
+                    デザインを更新する
+                </button>
+            </div>
+        </div>
+
+        <!-- プレビュー -->
+        <div class="flex flex-col gap-6">
+            <div class="preview-area bg-gray-100 border border-gray-200 p-8">
+                <canvas id="spineCanvas"></canvas>
+                <img id="previewImage" alt="Tシャツプレビュー" class="hidden">
+                <div id="placeholder" class="text-gray-400 font-bold">デザインを更新してください</div>
+            </div>
+            
+            <div id="downloadArea" class="hidden space-y-3">
+                <button id="saveBtn" class="w-full bg-white border-2 border-black text-black font-bold py-5 rounded-2xl hover:bg-black hover:text-white transition-all shadow-md text-lg">
+                    画像を保存する
+                </button>
+                <button id="shareXBtn" class="w-full bg-[#000000] text-white font-bold py-5 rounded-2xl hover:opacity-90 transition-all shadow-md text-lg flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></svg>
+                    保存した画像を X でポスト
+                </button>
+                <p>※自動では画像添付されません！画像を保存してから、保存した画像を添付の上ポストしてください！</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('spineCanvas');
+        const ctx = canvas.getContext('2d');
+        const previewImg = document.getElementById('previewImage');
+        const titleInput = document.getElementById('bookTitle');
+        const authorInput = document.getElementById('bookAuthor');
+        const fontSelect = document.getElementById('fontFamily');
+        const weightSelect = document.getElementById('fontWeight');
+        const generateBtn = document.getElementById('generateBtn');
+        const saveBtn = document.getElementById('saveBtn');
+        const shareXBtn = document.getElementById('shareXBtn');
+        const downloadArea = document.getElementById('downloadArea');
+        const placeholder = document.getElementById('placeholder');
+
+        function draw() {
+            const title = titleInput.value.trim() || '無題';
+            const author = authorInput.value.trim() || '';
+            const fontFamily = fontSelect.value;
+            const fontWeight = weightSelect.value;
+            
+            const tw = 400;
+            const th = 450;
+            canvas.width = tw;
+            canvas.height = th;
+
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, tw, th);
+
+            // Tシャツシルエット（白固定）
+            ctx.fillStyle = '#FFFFFF';
+            ctx.beginPath();
+            ctx.moveTo(tw * 0.25, th * 0.05);
+            ctx.quadraticCurveTo(tw * 0.3, th * 0.05, tw * 0.35, th * 0.12);
+            ctx.quadraticCurveTo(tw * 0.5, th * 0.22, tw * 0.65, th * 0.12);
+            ctx.quadraticCurveTo(tw * 0.7, th * 0.05, tw * 0.75, th * 0.05);
+            ctx.lineTo(tw * 0.95, th * 0.25);
+            ctx.lineTo(tw * 0.85, th * 0.35);
+            ctx.lineTo(tw * 0.8, th * 0.3);
+            ctx.lineTo(tw * 0.8, th * 0.95);
+            ctx.lineTo(tw * 0.2, th * 0.95);
+            ctx.lineTo(tw * 0.2, th * 0.3);
+            ctx.lineTo(tw * 0.15, th * 0.35);
+            ctx.lineTo(tw * 0.05, th * 0.25);
+            ctx.closePath();
+            ctx.fill();
+
+            // シルエットの輪郭
+            ctx.strokeStyle = 'rgba(0,0,0,0.1)';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // 襟元のライン
+            ctx.beginPath();
+            ctx.moveTo(tw * 0.35, th * 0.12);
+            ctx.quadraticCurveTo(tw * 0.5, th * 0.25, tw * 0.65, th * 0.12);
+            ctx.stroke();
+
+            // テキスト描画
+            ctx.fillStyle = '#000000';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            const lines = title.split('\n');
+            const fontSize = 32;
+            const lineHeight = fontSize * 1.3;
+            const totalTextHeight = (lines.length * lineHeight) + (author ? 30 : 0);
+            
+            let textY = (th * 0.55) - (totalTextHeight / 2) + (fontSize / 2);
+
+            ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
+            lines.forEach(line => {
+                ctx.fillText(line, tw / 2, textY, tw * 0.5);
+                textY += lineHeight;
+            });
+
+            if (author) {
+                const authorFontSize = 18;
+                ctx.font = `400 ${authorFontSize}px ${fontFamily}`;
+                textY += 10;
+                ctx.fillText(author, tw / 2, textY, tw * 0.5);
+            }
+
+            previewImg.src = canvas.toDataURL('image/png');
+            previewImg.classList.remove('hidden');
+            placeholder.classList.add('hidden');
+            downloadArea.classList.remove('hidden');
+        }
+
+        saveBtn.onclick = () => {
+            const link = document.createElement('a');
+            link.download = `面白Tシャツ-${Date.now()}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        };
+
+        shareXBtn.onclick = () => {
+            const title = titleInput.value.replace(/\n/g, ' ').trim();
+            const text = `#面白Tシャツメーカー\n「${title}」\n\n面白Tシャツの作成はここから↓ \nhttps://sayamamaya.github.io/KakuBunko/`;
+            const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+            window.open(url, '_blank');
+        };
+
+        generateBtn.onclick = draw;
+        window.onload = () => {
+            document.fonts.ready.then(() => draw());
+        };
+    </script>
+</body>
+</html>
